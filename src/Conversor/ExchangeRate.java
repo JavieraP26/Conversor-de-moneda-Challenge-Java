@@ -18,7 +18,7 @@ public class ExchangeRate {
     private final String apiKey;
 
     public ExchangeRate() {
-        // Lee de variable de entorno EXCHANGE_RATE_API_KEY o de propiedad -DAPI_KEY
+
         String env = System.getenv("EXCHANGE_RATE_API_KEY");
         String prop = System.getProperty("API_KEY");
         this.apiKey = (env != null && !env.isBlank()) ? env : prop;
@@ -29,10 +29,7 @@ public class ExchangeRate {
         }
     }
 
-    /**
-     * Devuelve el mapa "conversion_rates" (p.ej. {"USD":1, "CLP":930.1, ...})
-     * usando la moneda base indicada.
-     */
+
     public Map<String, Double> obtenerTasas(String base) {
         String url = String.format("%s/%s/latest/%s", BASE_URL, apiKey, base);
         HttpRequest req = HttpRequest.newBuilder(URI.create(url)).GET().build();
@@ -46,7 +43,7 @@ public class ExchangeRate {
 
             JsonObject json = GSON.fromJson(res.body(), JsonObject.class);
 
-            // La API v6 entrega: { "result":"success", "conversion_rates":{...}, ... }
+
             String result = json.has("result") ? json.get("result").getAsString() : "error";
             if (!"success".equalsIgnoreCase(result)) {
                 String msg = json.has("error-type") ? json.get("error-type").getAsString() : "desconocido";
@@ -54,7 +51,7 @@ public class ExchangeRate {
             }
 
             JsonObject rates = json.getAsJsonObject("conversion_rates");
-            // Gson puede mapear el objeto a Map<String, Double> directo
+
             @SuppressWarnings("unchecked")
             Map<String, Double> map = GSON.fromJson(rates, Map.class);
             return map;
